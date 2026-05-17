@@ -23,6 +23,8 @@ def _looks_like_unsafe_path(value: str) -> str | None:
         return "home-directory expansion is not allowed"
     if _URI_SCHEME_RE.match(value):
         return "URI schemes are not allowed"
+    if "\\" in value:
+        return "backslash path separators are not allowed; use POSIX-style forward slashes"
     if value.startswith("\\\\") or value.startswith("//"):
         return "UNC paths are not allowed"
     if value.startswith("\\") or value.startswith("/"):
@@ -65,4 +67,4 @@ def safe_href(value: str) -> str | None:
         assert_safe_relative_path(value, label="Markdown link")
     except UnsafePathError:
         return None
-    return value.replace("\\", "/")
+    return value

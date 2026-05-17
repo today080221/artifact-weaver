@@ -1,5 +1,10 @@
 # Change Log
 
+## 2026-05-17: P2 Backslash Traversal Safety Fix
+
+- Rejected backslash path separators before Markdown links or manifest paths can be normalized.
+- Added regression validation for Windows-style traversal attempts such as `..\secret.txt`.
+
 ## 2026-05-17: P1 Markdown Link Safety Fix
 
 - Rejected URI-scheme Markdown links such as `javascript:`, `data:`, and external URL forms.

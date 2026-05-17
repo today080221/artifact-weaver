@@ -31,6 +31,6 @@ Render Manifest v1 declares the source artifacts and generated HTML output.
 }
 ```
 
-All source paths must be relative to the manifest directory. Absolute paths, drive-letter paths, UNC paths, URLs, home-directory expansion, and path traversal are rejected.
+All source paths must be relative to the manifest directory and must use POSIX-style forward slashes. Absolute paths, drive-letter paths, UNC paths, URLs, URI schemes, home-directory expansion, backslash path separators, and path traversal are rejected.
 
 M0 supports Markdown, report JSON, evidence JSON, and one HTML output. YAML, slides, PDF, theme packages, external asset downloads, and JavaScript bundling are future work.

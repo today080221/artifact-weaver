@@ -10,4 +10,6 @@ python tools/validate_repo.py
 
 M0 的 Markdown 链接只允许安全相对路径和页面内锚点。`javascript:`、`data:`、`file:`、`http:`、`https:`、`mailto:` 以及其他带 URI scheme 的形式都不能渲染成 HTML 链接。
 
+M0 会直接拒绝反斜杠路径分隔符，而不是把它归一化为正斜杠。因此 `..\secret.txt` 这类 Windows 风格路径穿越不能渲染成链接。
+
 脚本会为子进程 CLI 检查设置 `PYTHONPATH=src`，因此在尚未执行可编辑安装的新检出仓库中，预提交钩子也可以使用。

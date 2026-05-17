@@ -1,5 +1,10 @@
 # 变更日志
 
+## 2026-05-17：P2 反斜杠路径穿越安全修复
+
+- 在 Markdown 链接或渲染清单路径可能被归一化之前，直接拒绝反斜杠路径分隔符。
+- 为 `..\secret.txt` 这类 Windows 风格路径穿越加入回归验证。
+
 ## 2026-05-17：P1 Markdown 链接安全修复
 
 - 拒绝 `javascript:`、`data:` 和外部 URL 等带 URI scheme 的 Markdown 链接。

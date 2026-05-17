@@ -10,4 +10,6 @@ The validation script compiles Python files, checks CLI help, renders the fake e
 
 M0 Markdown links only allow safe relative paths and in-page anchors. URI schemes such as `javascript:`, `data:`, `file:`, `http:`, `https:`, `mailto:`, and other scheme forms must not render as HTML links.
 
+M0 rejects backslash path separators instead of normalizing them into forward slashes, so Windows-style traversal such as `..\secret.txt` must not render as a link.
+
 The script sets `PYTHONPATH=src` for subprocess CLI checks so the pre-commit hook remains usable in a fresh checkout before editable install.
