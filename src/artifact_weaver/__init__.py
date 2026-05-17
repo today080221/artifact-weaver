@@ -2,4 +2,4 @@
 
 """ArtifactWeaver renders structured artifacts into static HTML."""
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
