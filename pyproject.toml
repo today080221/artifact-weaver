@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "artifact-weaver"
-version = "0.1.3"
+version = "0.1.4"
 description = "ArtifactWeaver renders Markdown and JSON artifacts into static HTML reports and future slides."
 readme = "README.md"
 requires-python = ">=3.10"
