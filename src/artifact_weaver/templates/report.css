@@ -142,9 +142,42 @@ dd {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
 }
 
+.evidence-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.evidence-card h3,
+.evidence-card p {
+  margin-bottom: 0;
+}
+
+.evidence-type {
+  color: #4b5563;
+  font-weight: 700;
+}
+
+.evidence-path code {
+  display: block;
+  font-size: 0.86rem;
+}
+
 .evidence-media {
   margin: 12px 0;
   max-width: 100%;
+}
+
+.evidence-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  max-height: 520px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #111827;
+  margin: 12px 0;
 }
 
 .evidence-video {
@@ -154,6 +187,13 @@ dd {
   max-height: min(70vh, 720px);
   max-width: 100%;
   width: 100%;
+}
+
+.evidence-metadata {
+  display: grid;
+  gap: 8px 12px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  margin: 4px 0 0;
 }
 
 code,

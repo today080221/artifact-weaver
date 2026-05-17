@@ -25,6 +25,9 @@ _VIDEO_MIME_TYPES = {
     ".ogg": "video/ogg",
 }
 _VIDEO_TYPE_ALIASES = {"video", "mp4", "webm", "ogg"}
+_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif"}
+_IMAGE_TYPE_ALIASES = {"screenshot", "image", "png", "jpg", "jpeg", "webp"}
+_UNSAFE_MEDIA_SCHEMES = ("data:", "javascript:", "vbscript:")
 
 
 def _escape(value: Any) -> str:
@@ -56,6 +59,11 @@ def _is_video_evidence(item: dict[str, Any]) -> bool:
     return evidence_type in _VIDEO_TYPE_ALIASES or _path_suffix(item.get("path", "")) in _VIDEO_MIME_TYPES
 
 
+def _is_image_evidence(item: dict[str, Any]) -> bool:
+    evidence_type = str(item.get("evidenceType", "")).strip().replace("_", "-").casefold()
+    return evidence_type in _IMAGE_TYPE_ALIASES or _path_suffix(item.get("path", "")) in _IMAGE_SUFFIXES
+
+
 def _video_mime_type(path: object, evidence_type: object) -> str:
     suffix = _path_suffix(path)
     if suffix in _VIDEO_MIME_TYPES:
@@ -66,13 +74,13 @@ def _video_mime_type(path: object, evidence_type: object) -> str:
     return ""
 
 
-def _video_source_path(path: object) -> str | None:
+def _media_source_path(path: object) -> str | None:
     raw = str(path).strip()
     if not raw:
         return None
     normalized = raw.replace("\\", "/")
     normalized_key = normalized.casefold()
-    if normalized_key.startswith(("data:", "javascript:")):
+    if normalized_key.startswith(_UNSAFE_MEDIA_SCHEMES):
         return None
     if _WINDOWS_DRIVE_PATH_RE.match(normalized):
         return "file:///" + normalized
@@ -84,7 +92,7 @@ def _video_source_path(path: object) -> str | None:
 def _video_player(item: dict[str, Any], messages: LocaleMessages) -> str:
     if not _is_video_evidence(item) or _is_explicit_false(item.get("exists", True)):
         return ""
-    source_path = _video_source_path(item.get("path", ""))
+    source_path = _media_source_path(item.get("path", ""))
     if source_path is None:
         return ""
     mime_type = _video_mime_type(item.get("path", ""), item.get("evidenceType", ""))
@@ -96,6 +104,68 @@ def _video_player(item: dict[str, Any], messages: LocaleMessages) -> str:
         f'{_escape(messages["video_unsupported"])}'
         "</video>"
         "</div>"
+    )
+
+
+def _image_preview(item: dict[str, Any], messages: LocaleMessages, locale: str) -> str:
+    if not _is_image_evidence(item) or _is_explicit_false(item.get("exists", True)):
+        return ""
+    source_path = _media_source_path(item.get("path", ""))
+    if source_path is None:
+        return ""
+    alt = item.get("label") or label_type(item.get("evidenceType", messages["unknown"]), locale)
+    return f'<img class="evidence-image" src="{_escape(source_path)}" alt="{_escape(alt)}">'
+
+
+def _evidence_media(item: dict[str, Any], messages: LocaleMessages, locale: str) -> str:
+    image_preview = _image_preview(item, messages, locale)
+    if image_preview:
+        return image_preview
+    return _video_player(item, messages)
+
+
+def _label_exists(value: object, messages: LocaleMessages) -> str:
+    if _is_explicit_false(value):
+        return messages["missing"]
+    if value is True:
+        return messages["present"]
+    if isinstance(value, str) and value.strip().casefold() in {"true", "1", "yes"}:
+        return messages["present"]
+    return str(value)
+
+
+def _evidence_metadata_rows(item: dict[str, Any], messages: LocaleMessages) -> str:
+    rows: list[tuple[str, str]] = []
+    if "width" in item or "height" in item:
+        width = item.get("width", messages["unknown"])
+        height = item.get("height", messages["unknown"])
+        rows.append((messages["dimensions"], f"{width} x {height}"))
+    field_labels = [
+        ("byteSize", messages["byte_size"]),
+        ("capturePhase", messages["capture_phase"]),
+        ("captureMarker", messages["capture_marker"]),
+        ("linkedCaseId", messages["linked_case_id"]),
+        ("linkedHarness", messages["linked_harness"]),
+    ]
+    rows.extend((label, str(item[key])) for key, label in field_labels if key in item)
+    if "exists" in item:
+        rows.append((messages["exists"], _label_exists(item["exists"], messages)))
+    if "isSupportEvidence" in item:
+        rows.append((messages["support_evidence"], label_bool(item["isSupportEvidence"], messages)))
+    if "isGameplayOracle" in item:
+        rows.append((messages["gameplay_oracle"], label_bool(item["isGameplayOracle"], messages)))
+    if not rows:
+        return ""
+    return (
+        '<dl class="evidence-metadata">'
+        + "".join(
+            "<div>"
+            f"<dt>{_escape(label)}</dt>"
+            f"<dd>{_escape(value)}</dd>"
+            "</div>"
+            for label, value in rows
+        )
+        + "</dl>"
     )
 
 
@@ -167,15 +237,10 @@ def _evidence_list(evidence: dict[str, Any], messages: LocaleMessages, locale: s
         cards.append(
             '<article class="evidence-card">'
             f"<h3>{_escape(item.get('label', messages['untitled_evidence']))}</h3>"
-            f"<p>{_escape(label_type(item.get('evidenceType', messages['unknown']), locale))}</p>"
-            f"<p><code>{_escape(item.get('path', ''))}</code></p>"
-            f"{_video_player(item, messages)}"
-            f"<p>{_escape(messages['exists'])}: "
-            f"{_escape(label_bool(item.get('exists', messages['unknown']), messages))}</p>"
-            f"<p>{_escape(messages['support_evidence'])}: "
-            f"{_escape(label_bool(item.get('isSupportEvidence', False), messages))}</p>"
-            f"<p>{_escape(messages['gameplay_oracle'])}: "
-            f"{_escape(label_bool(item.get('isGameplayOracle', False), messages))}</p>"
+            f"<p class=\"evidence-type\">{_escape(label_type(item.get('evidenceType', messages['unknown']), locale))}</p>"
+            f"<p class=\"evidence-path\"><code>{_escape(item.get('path', ''))}</code></p>"
+            f"{_evidence_media(item, messages, locale)}"
+            f"{_evidence_metadata_rows(item, messages)}"
             "</article>"
         )
     return '<div class="evidence-grid">' + "".join(cards) + "</div>"
