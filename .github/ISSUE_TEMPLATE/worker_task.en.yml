@@ -1,0 +1,60 @@
+name: Worker task
+description: Scoped implementation or documentation task
+title: "Worker: "
+labels: ["type:task", "status:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should this worker task achieve?
+    validations:
+      required: true
+  - type: input
+    id: context-pack
+    attributes:
+      label: Context pack
+      placeholder: docs/en/harness/context-packs/m0-bootstrap.md
+    validations:
+      required: true
+  - type: textarea
+    id: allowed-paths
+    attributes:
+      label: Allowed paths
+      description: Paths the worker may edit.
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Paths, integrations, or behaviors the worker must not touch.
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation commands
+      value: |
+        python tools/validate_repo.py
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Documentation updates required
+      description: English and Simplified Chinese docs that must be updated.
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: Handoff checklist
+      value: |
+        - Summary included
+        - Validation result included
+        - Private data guard checked
+        - No generated dist committed
+        - No automatic commit or push
+    validations:
+      required: true

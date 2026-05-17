@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "artifact-weaver"
+version = "0.1.0"
+description = "ArtifactWeaver renders Markdown and JSON artifacts into static HTML reports and future slides."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Jianwen Huang" }
+]
+keywords = ["artifacts", "reports", "markdown", "json", "html"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Documentation",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/today080221/artifact-weaver"
+Repository = "https://github.com/today080221/artifact-weaver"
+Issues = "https://github.com/today080221/artifact-weaver/issues"
+
+[project.scripts]
+artifact-weaver = "artifact_weaver.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+artifact_weaver = ["templates/*.html", "templates/*.css"]

@@ -1,0 +1,32 @@
+{
+  "conclusion": "passed",
+  "counts": {
+    "pass": 3,
+    "fail": 0,
+    "gap": 1
+  },
+  "sections": [
+    {
+      "title": "Scope",
+      "body": "This is fake demo data for a generic artifact report."
+    },
+    {
+      "title": "Result",
+      "body": "The fake report demonstrates how structured artifacts are rendered into a static HTML view."
+    }
+  ],
+  "artifacts": [
+    {
+      "artifactId": "artifact-001",
+      "label": "Fake config validation summary",
+      "path": "report.json",
+      "kind": "json"
+    },
+    {
+      "artifactId": "artifact-002",
+      "label": "Fake narrative report",
+      "path": "report.md",
+      "kind": "markdown"
+    }
+  ]
+}

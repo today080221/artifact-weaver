@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "evidenceId": "ev-001",
+      "evidenceType": "screenshot-placeholder",
+      "label": "Example screenshot placeholder",
+      "path": "screenshots/placeholder.txt",
+      "exists": true,
+      "isSupportEvidence": true,
+      "isGameplayOracle": false
+    }
+  ]
+}

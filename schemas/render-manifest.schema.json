@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/today080221/artifact-weaver/schemas/render-manifest.schema.json",
+  "title": "ArtifactWeaver Render Manifest v1",
+  "type": "object",
+  "required": ["schemaVersion", "document", "theme", "sources", "outputs", "boundaries"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "const": "render-manifest/v1"
+    },
+    "document": {
+      "type": "object",
+      "required": ["title"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "subtitle": { "type": "string" },
+        "generatedAt": { "type": "string" },
+        "locale": { "type": "string" }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "accent": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" }
+      }
+    },
+    "sources": {
+      "type": "object",
+      "required": ["markdown", "reportJson", "evidenceJson"],
+      "additionalProperties": false,
+      "properties": {
+        "markdown": { "type": "string" },
+        "reportJson": { "type": "string" },
+        "evidenceJson": { "type": "string" }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["html"],
+      "additionalProperties": false,
+      "properties": {
+        "html": { "type": "string" }
+      }
+    },
+    "boundaries": {
+      "type": "object",
+      "required": ["sourceOfTruth", "generatedView", "privateDataPolicy"],
+      "additionalProperties": false,
+      "properties": {
+        "sourceOfTruth": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "generatedView": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "privateDataPolicy": { "type": "string" }
+      }
+    }
+  }
+}
