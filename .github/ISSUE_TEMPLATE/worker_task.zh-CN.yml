@@ -1,0 +1,60 @@
+name: 执行者任务
+description: 有范围限制的实现或文档任务
+title: "执行者："
+labels: ["type:task", "status:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目标
+      description: 这个执行者任务要达成什么？
+    validations:
+      required: true
+  - type: input
+    id: context-pack
+    attributes:
+      label: 上下文包
+      placeholder: docs/zh-CN/harness/context-packs/m0-bootstrap.md
+    validations:
+      required: true
+  - type: textarea
+    id: allowed-paths
+    attributes:
+      label: 允许修改的路径
+      description: 执行者可以编辑的路径。
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: 范围外内容
+      description: 执行者不能触碰的路径、集成或行为。
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: 验证命令
+      value: |
+        python tools/validate_repo.py
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: 必需文档更新
+      description: 必须更新的英文和简体中文文档。
+    validations:
+      required: true
+  - type: textarea
+    id: handoff
+    attributes:
+      label: 交接清单
+      value: |
+        - 已包含变更摘要
+        - 已包含验证结果
+        - 已检查私有数据护栏
+        - 未提交生成的 dist
+        - 未自动提交或推送
+    validations:
+      required: true

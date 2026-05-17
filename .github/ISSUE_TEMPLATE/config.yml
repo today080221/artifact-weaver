@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: ArtifactWeaver documentation
+    url: https://github.com/today080221/artifact-weaver/tree/main/docs
+    about: Read project documentation before opening large scope changes.

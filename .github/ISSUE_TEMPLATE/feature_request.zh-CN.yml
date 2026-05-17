@@ -1,0 +1,24 @@
+name: 功能请求
+description: 提议公开的 ArtifactWeaver 能力
+title: "功能："
+labels: ["type:task", "status:ready"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目标
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 范围摘要
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: 边界说明
+      description: 确认提议不加入私有适配器或私有数据。
+    validations:
+      required: true
