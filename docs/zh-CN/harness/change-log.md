@@ -1,5 +1,10 @@
 # 变更日志
 
+## 2026-05-17：P1 Markdown 链接安全修复
+
+- 拒绝 `javascript:`、`data:` 和外部 URL 等带 URI scheme 的 Markdown 链接。
+- 为不安全 Markdown 链接、允许的相对链接和页面内锚点加入回归验证。
+
 ## 2026-05-17：M0 评审修复
 
 - 在 Git 索引中将 hook 文件标记为可执行。

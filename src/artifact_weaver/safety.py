@@ -7,7 +7,7 @@ import re
 from pathlib import Path, PureWindowsPath
 
 
-_URL_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*://")
+_URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
 
 
 class UnsafePathError(ValueError):
@@ -21,10 +21,12 @@ def _looks_like_unsafe_path(value: str) -> str | None:
         return "path must not contain NUL bytes"
     if value.startswith("~"):
         return "home-directory expansion is not allowed"
-    if _URL_RE.match(value):
-        return "URL paths are not allowed"
+    if _URI_SCHEME_RE.match(value):
+        return "URI schemes are not allowed"
     if value.startswith("\\\\") or value.startswith("//"):
         return "UNC paths are not allowed"
+    if value.startswith("\\") or value.startswith("/"):
+        return "absolute paths are not allowed"
     if PureWindowsPath(value).drive:
         return "drive-letter paths are not allowed"
     candidate = Path(value)
@@ -57,10 +59,10 @@ def safe_join(root: Path, value: str, *, label: str, must_exist: bool = False) -
 
 
 def safe_href(value: str) -> str | None:
+    if value.startswith("#"):
+        return value if len(value) > 1 else None
     try:
         assert_safe_relative_path(value, label="Markdown link")
     except UnsafePathError:
-        if value.startswith("#") and len(value) > 1:
-            return value
         return None
     return value.replace("\\", "/")

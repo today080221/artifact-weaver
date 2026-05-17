@@ -1,5 +1,10 @@
 # Change Log
 
+## 2026-05-17: P1 Markdown Link Safety Fix
+
+- Rejected URI-scheme Markdown links such as `javascript:`, `data:`, and external URL forms.
+- Added regression validation for unsafe Markdown links and allowed relative links plus in-page anchors.
+
 ## 2026-05-17: M0 Review Fix
 
 - Marked Git hook files as executable in the Git index.
