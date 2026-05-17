@@ -13,7 +13,7 @@ body {
 }
 
 main {
-  width: min(1040px, calc(100% - 32px));
+  width: min(1440px, calc(100% - 32px));
   max-width: 100%;
   margin: 0 auto;
   padding: 32px 0 56px;
@@ -135,7 +135,25 @@ dd {
 
 .evidence-grid,
 .boundary-grid {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.evidence-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+
+.evidence-media {
+  margin: 12px 0;
+  max-width: 100%;
+}
+
+.evidence-video {
+  background: #111827;
+  border-radius: 6px;
+  display: block;
+  max-height: min(70vh, 720px);
+  max-width: 100%;
+  width: 100%;
 }
 
 code,
@@ -196,4 +214,10 @@ th code {
 footer {
   padding: 24px;
   text-align: center;
+}
+
+@media (min-width: 960px) {
+  main {
+    width: min(1440px, calc(100% - 64px));
+  }
 }
