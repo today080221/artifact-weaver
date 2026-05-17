@@ -1,5 +1,10 @@
 # Change Log
 
+## 2026-05-17: M0 Review Fix
+
+- Marked Git hook files as executable in the Git index.
+- Extended validation to check hook executable modes and both working-tree and staged whitespace errors.
+
 ## 2026-05-17: M0 Bootstrap Start
 
 - Created the M0 bootstrap branch.

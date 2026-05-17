@@ -10,6 +10,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
+HOOK_FILES = [
+    ".githooks/pre-commit",
+    ".githooks/pre-push",
+    ".githooks/post-checkout",
+    ".githooks/post-commit",
+    ".githooks/post-merge",
+]
 
 
 def _env() -> dict[str, str]:
@@ -47,6 +54,24 @@ def _assert_no_tracked_dist() -> None:
     _run(["git", "status", "--short", "--", "dist"])
 
 
+def _assert_hooks_executable() -> None:
+    output = _run(["git", "ls-files", "-s", *HOOK_FILES], check_output=True)
+    modes: dict[str, str] = {}
+    for line in output.splitlines():
+        parts = line.split(None, 3)
+        if len(parts) != 4:
+            raise RuntimeError(f"Unexpected git ls-files -s output: {line}")
+        modes[parts[3]] = parts[0]
+
+    failures = []
+    for hook_file in HOOK_FILES:
+        mode = modes.get(hook_file)
+        if mode != "100755":
+            failures.append(f"{hook_file} has mode {mode or 'missing'}, expected 100755")
+    if failures:
+        raise RuntimeError("Git hook executable mode check failed: " + "; ".join(failures))
+
+
 def main() -> int:
     try:
         python_files = sorted(str(path.relative_to(ROOT)) for path in (ROOT / "src" / "artifact_weaver").glob("*.py"))
@@ -70,7 +95,9 @@ def main() -> int:
         _run([PYTHON, "tools/check_bilingual_docs.py"])
         _run([PYTHON, "tools/check_private_scope.py"])
         _assert_no_tracked_dist()
+        _assert_hooks_executable()
         _run(["git", "diff", "--check"])
+        _run(["git", "diff", "--cached", "--check"])
     except Exception as exc:  # noqa: BLE001 - validation entrypoint should print one clear failure.
         print(f"Validation failed: {exc}", file=sys.stderr)
         return 1
