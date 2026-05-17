@@ -10,13 +10,21 @@ from pathlib import Path
 from typing import Any
 
 from . import __version__
-from .i18n import LocaleMessages, label_bool, label_status, resolve_locale
+from .i18n import LocaleMessages, label_bool, label_status, label_type, resolve_locale
 from .manifest import load_manifest
 from .markdown import render_markdown
 from .safety import safe_join
 
 
 _HEX_COLOR_RE = re.compile(r"^#[0-9A-Fa-f]{6}$")
+_WINDOWS_DRIVE_PATH_RE = re.compile(r"^[A-Za-z]:[\\/]")
+_URI_SCHEME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*:")
+_VIDEO_MIME_TYPES = {
+    ".mp4": "video/mp4",
+    ".webm": "video/webm",
+    ".ogg": "video/ogg",
+}
+_VIDEO_TYPE_ALIASES = {"video", "mp4", "webm", "ogg"}
 
 
 def _escape(value: Any) -> str:
@@ -28,6 +36,67 @@ def _read_json(path: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"JSON artifact must be an object: {path.name}")
     return value
+
+
+def _path_suffix(value: object) -> str:
+    path = str(value).replace("\\", "/").split("?", 1)[0].split("#", 1)[0]
+    return Path(path).suffix.casefold()
+
+
+def _is_explicit_false(value: object) -> bool:
+    if value is False:
+        return True
+    if isinstance(value, str):
+        return value.strip().casefold() in {"false", "0", "no"}
+    return False
+
+
+def _is_video_evidence(item: dict[str, Any]) -> bool:
+    evidence_type = str(item.get("evidenceType", "")).strip().replace("_", "-").casefold()
+    return evidence_type in _VIDEO_TYPE_ALIASES or _path_suffix(item.get("path", "")) in _VIDEO_MIME_TYPES
+
+
+def _video_mime_type(path: object, evidence_type: object) -> str:
+    suffix = _path_suffix(path)
+    if suffix in _VIDEO_MIME_TYPES:
+        return _VIDEO_MIME_TYPES[suffix]
+    evidence_type_key = str(evidence_type).strip().casefold()
+    if evidence_type_key in {"mp4", "webm", "ogg"}:
+        return f"video/{evidence_type_key}"
+    return ""
+
+
+def _video_source_path(path: object) -> str | None:
+    raw = str(path).strip()
+    if not raw:
+        return None
+    normalized = raw.replace("\\", "/")
+    normalized_key = normalized.casefold()
+    if normalized_key.startswith(("data:", "javascript:")):
+        return None
+    if _WINDOWS_DRIVE_PATH_RE.match(normalized):
+        return "file:///" + normalized
+    if _URI_SCHEME_RE.match(normalized) and not normalized_key.startswith(("file://", "http://", "https://")):
+        return None
+    return normalized
+
+
+def _video_player(item: dict[str, Any], messages: LocaleMessages) -> str:
+    if not _is_video_evidence(item) or _is_explicit_false(item.get("exists", True)):
+        return ""
+    source_path = _video_source_path(item.get("path", ""))
+    if source_path is None:
+        return ""
+    mime_type = _video_mime_type(item.get("path", ""), item.get("evidenceType", ""))
+    type_attr = f' type="{_escape(mime_type)}"' if mime_type else ""
+    return (
+        '<div class="evidence-media">'
+        '<video controls preload="metadata" class="evidence-video">'
+        f'<source src="{_escape(source_path)}"{type_attr}>'
+        f'{_escape(messages["video_unsupported"])}'
+        "</video>"
+        "</div>"
+    )
 
 
 def _metric_grid(counts: dict[str, Any], messages: LocaleMessages, locale: str) -> str:
@@ -58,7 +127,7 @@ def _sections(report: dict[str, Any], messages: LocaleMessages) -> str:
     return "\n".join(blocks)
 
 
-def _artifact_index(report: dict[str, Any], messages: LocaleMessages) -> str:
+def _artifact_index(report: dict[str, Any], messages: LocaleMessages, locale: str) -> str:
     artifacts = report.get("artifacts", [])
     if not isinstance(artifacts, list) or not artifacts:
         return f'<p class="muted">{_escape(messages["no_artifact_index"])}</p>'
@@ -70,7 +139,7 @@ def _artifact_index(report: dict[str, Any], messages: LocaleMessages) -> str:
             "<tr>"
             f"<td>{_escape(artifact.get('artifactId', ''))}</td>"
             f"<td>{_escape(artifact.get('label', ''))}</td>"
-            f"<td>{_escape(artifact.get('kind', ''))}</td>"
+            f"<td>{_escape(label_type(artifact.get('kind', ''), locale))}</td>"
             f"<td><code>{_escape(artifact.get('path', ''))}</code></td>"
             "</tr>"
         )
@@ -87,7 +156,7 @@ def _artifact_index(report: dict[str, Any], messages: LocaleMessages) -> str:
     )
 
 
-def _evidence_list(evidence: dict[str, Any], messages: LocaleMessages) -> str:
+def _evidence_list(evidence: dict[str, Any], messages: LocaleMessages, locale: str) -> str:
     items = evidence.get("items", [])
     if not isinstance(items, list) or not items:
         return f'<p class="muted">{_escape(messages["no_linked_evidence"])}</p>'
@@ -98,9 +167,11 @@ def _evidence_list(evidence: dict[str, Any], messages: LocaleMessages) -> str:
         cards.append(
             '<article class="evidence-card">'
             f"<h3>{_escape(item.get('label', messages['untitled_evidence']))}</h3>"
-            f"<p>{_escape(item.get('evidenceType', messages['unknown']))}</p>"
+            f"<p>{_escape(label_type(item.get('evidenceType', messages['unknown']), locale))}</p>"
             f"<p><code>{_escape(item.get('path', ''))}</code></p>"
-            f"<p>{_escape(messages['exists'])}: {_escape(label_bool(item.get('exists', False), messages))}</p>"
+            f"{_video_player(item, messages)}"
+            f"<p>{_escape(messages['exists'])}: "
+            f"{_escape(label_bool(item.get('exists', messages['unknown']), messages))}</p>"
             f"<p>{_escape(messages['support_evidence'])}: "
             f"{_escape(label_bool(item.get('isSupportEvidence', False), messages))}</p>"
             f"<p>{_escape(messages['gameplay_oracle'])}: "
@@ -176,8 +247,8 @@ def render_report(manifest_path: Path, out_dir: Path, *, strict: bool = False) -
         ),
         narrative=narrative_html,
         sections=_sections(report, messages),
-        evidence=_evidence_list(evidence, messages),
-        artifact_index=_artifact_index(report, messages),
+        evidence=_evidence_list(evidence, messages, locale),
+        artifact_index=_artifact_index(report, messages, locale),
         boundaries=_boundaries(
             manifest.boundaries.source_of_truth,
             manifest.boundaries.generated_view,
