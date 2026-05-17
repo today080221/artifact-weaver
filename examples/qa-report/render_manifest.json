@@ -1,10 +1,10 @@
 {
   "schemaVersion": "render-manifest/v1",
   "document": {
-    "title": "Example QA Report",
-    "subtitle": "Fake data demo",
+    "title": "私有下游项目 R1 烟测",
+    "subtitle": "虚构且已脱敏的 ArtifactWeaver 集成演示",
     "generatedAt": "2026-01-01T00:00:00Z",
-    "locale": "en"
+    "locale": "zh-Hans"
   },
   "theme": {
     "name": "default",
@@ -28,6 +28,6 @@
     "generatedView": [
       "report.html"
     ],
-    "privateDataPolicy": "fake-data-only"
+    "privateDataPolicy": "仅限虚构脱敏演示"
   }
 }

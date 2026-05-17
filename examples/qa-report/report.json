@@ -1,5 +1,5 @@
 {
-  "conclusion": "passed",
+  "conclusion": "passed-with-gaps",
   "counts": {
     "pass": 3,
     "fail": 0,
@@ -7,24 +7,28 @@
   },
   "sections": [
     {
-      "title": "Scope",
-      "body": "This is fake demo data for a generic artifact report."
+      "title": "范围",
+      "body": "本报告使用虚构数据验证私有下游项目可以生成 ArtifactWeaver 输入。"
     },
     {
-      "title": "Result",
-      "body": "The fake report demonstrates how structured artifacts are rendered into a static HTML view."
+      "title": "结果",
+      "body": "ArtifactWeaver 可以把 Markdown、JSON 和证据元数据渲染为静态 HTML。生成的 HTML 是视图层，不是事实来源。"
+    },
+    {
+      "title": "边界",
+      "body": "不包含真实 QA 报告、真实截图、技能 ID、羁绊 ID、公司路径、本机绝对路径或内部 prompt。"
     }
   ],
   "artifacts": [
     {
-      "artifactId": "artifact-001",
-      "label": "Fake config validation summary",
+      "artifactId": "fake-artifact-001",
+      "label": "虚构且已脱敏的结构化摘要",
       "path": "report.json",
       "kind": "json"
     },
     {
-      "artifactId": "artifact-002",
-      "label": "Fake narrative report",
+      "artifactId": "fake-artifact-002",
+      "label": "虚构且已脱敏的 Markdown 叙述",
       "path": "report.md",
       "kind": "markdown"
     }

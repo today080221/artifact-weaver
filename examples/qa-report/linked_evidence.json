@@ -1,9 +1,9 @@
 {
   "items": [
     {
-      "evidenceId": "ev-001",
-      "evidenceType": "screenshot-placeholder",
-      "label": "Example screenshot placeholder",
+      "evidenceId": "fake-ev-001",
+      "evidenceType": "虚构占位",
+      "label": "虚构占位证据",
       "path": "screenshots/placeholder.txt",
       "exists": true,
       "isSupportEvidence": true,
