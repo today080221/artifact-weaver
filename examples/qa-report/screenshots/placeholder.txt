@@ -1,2 +1,2 @@
-This is a placeholder file.
-Do not place real screenshots in this open-source example.
+这是 ArtifactWeaver R1 烟测使用的虚构占位证据。
+不要把真实截图放入这个开源示例。

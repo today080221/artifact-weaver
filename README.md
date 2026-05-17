@@ -36,6 +36,14 @@ Markdown, JSON, and render manifest files are the source of truth. HTML is a gen
 
 The built-in Markdown renderer is intentionally minimal for M0 and may be replaced by a CommonMark-compatible parser later.
 
+## Localization
+
+ArtifactWeaver reads `document.locale` from `render_manifest.json` when rendering report UI chrome.
+
+- `zh-Hans`, `zh-CN`, `zh`, and `Chinese` render simplified Chinese labels and `<html lang="zh-Hans">`.
+- Missing or unsupported locales fall back to English for backward compatibility.
+- Report artifact content is rendered as provided by downstream artifacts; only renderer UI chrome and built-in status labels are localized.
+
 ## Downstream Project Integration
 
 Private downstream projects should generate a render manifest and call ArtifactWeaver as a renderer. They remain responsible for producing their own artifacts, evidence assets, and private workflow data.
